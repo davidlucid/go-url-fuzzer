@@ -11,6 +11,8 @@ import (
 	"github.com/mtojek/go-url-fuzzer/configuration"
 	"github.com/mtojek/go-url-fuzzer/flow/messages"
 	"github.com/trustmaster/goflow"
+	
+	"errors"
 )
 
 // URLChecker consumes entries containing relative URL to check and HTTP method.
@@ -40,7 +42,9 @@ func NewURLChecker(configuration *configuration.Configuration) *URLChecker {
 
 func createHTTPClient(configuration *configuration.Configuration) *http.Client {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: configuration.URLResponseTimeout()}
+	client := &http.Client{Transport: tr, Timeout: configuration.URLResponseTimeout(), CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		return errors.New("Redirect")
+	}}
 	return client
 }
 
